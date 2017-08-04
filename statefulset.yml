@@ -1,0 +1,40 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: artifactory
+  labels:
+    name: artifactory
+    app: artifactory
+  namespace: immediate
+spec:
+  serviceName: artifactory
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: artifactory
+    spec:
+      containers:
+      - name: artifactory
+        image: bujail/private:artifactory
+        imagePullPolicy: Always
+        command: [ "echo", "SUCCESS" ]
+        ports:
+          - containerPort: 8081
+            name: artifactory
+        volumeMounts:
+          - mountPath: /var/opt/jfrog/artifactory
+            name: artifactory
+      imagePullSecrets:
+        - name: regsecret
+  volumeClaimTemplates:
+  - metadata:
+      name: artifactory
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "artifactory"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+
